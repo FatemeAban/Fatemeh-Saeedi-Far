@@ -42,10 +42,9 @@ p {
 }
 
 #name h1 {
-	font-size: 2em;
+	font-size: 1.7em;
 	font-weight: 700;
 	font-family: 'Rokkitt', Helvetica, Arial, sans-serif;
-	margin-bottom: 6px;
 }
 
 #name 
@@ -60,9 +59,10 @@ p {
 }
 
 #headshot {
-	width: 12.5%;
+	width: 15%;
 	float: left;
 	margin-right: 30px;
+	margin-top: 20px;
 }
 
 #headshot img {
@@ -77,19 +77,20 @@ p {
 }
 
 #contactDetails {
-	float: right;
+	float: left;
+	font-size: 0.8em;
 
 }
 
 #contactDetails ul {
 	list-style-type: none;
-	font-size: 0.9em;
+	font-size: 0.8em;
 	margin-top: 2px;
-	text-align: right;
+	text-align: left;
 }
 
 #contactDetails ul li {
-	margin-bottom: 0.3em;
+	margin-bottom: 0.1em;
 	color: #444;
 }
 
@@ -109,6 +110,25 @@ p {
 #contactDetails ul #email{
 	color: #000066;
 }
+
+
+#QRCode {
+	width: 20%;
+	float: right;
+	text-align: center;
+}
+
+#QRCode img {
+	width: 100%;
+	height: auto;
+	display: none;
+}
+#QRCode div {
+	width: 100%;
+	color: #149DC5;	
+	display: none;
+}
+
 
 
 section {
@@ -265,7 +285,19 @@ section:last-child {
 	text-align: right;
 	margin-right:0em;
 	color: #149DC5;
-}
+	}
+
+	#QRCode{
+		text-align: center;
+	}
+
+	#QRCode div{
+		display:flex;		
+	}
+
+	#QRCode img{
+		display: flex;
+	}
 
 
     #cv {

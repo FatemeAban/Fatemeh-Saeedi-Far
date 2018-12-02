@@ -1,0 +1,154 @@
+package com.example.fatemeh.robotselfordering.Screen;
+
+import android.app.ProgressDialog;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.widget.Button;
+import android.widget.EditText;
+
+import com.afollestad.materialdialogs.MaterialDialog;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+
+public class Robotcomm {
+
+    //Messege sending related
+    EditText edt_send_message;
+    Button btn_send;
+
+    //Thread related
+    String ip = "";
+    Thread thread = null;
+    OutputStream out = null;
+    PrintWriter output = null;
+    PrintWriter writer = null;
+    BufferedReader input = null;
+    Socket s;
+    String voiceMsg = "";
+    String cmd;
+    String st = null;
+
+
+// Send message button
+
+    private void sendMessage(final String msg) {
+        new Handler().postDelayed(new Runnable() {
+            Thread t1 = null;
+
+            @Override
+            public void run() {
+                t1 = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Looper.prepare();
+
+
+                        //Voice message will not send until user insert message for voice
+                        if (msg.equals("Voice")) {
+                            new MaterialDialog.Builder(Robotcomm.this)
+                                    .title("Please insert message")
+                                    .content("")
+                                    .cancelable(false)
+                                    .inputRange(2, 700)
+                                    .input("Message", voiceMsg, new MaterialDialog.InputCallback() {
+                                        @Override
+                                        public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                                            voiceMsg = input.toString();
+                                            sendMessage("Voice;" + voiceMsg.trim().toString());
+                                        }
+                                    }).show();
+
+                        } else {
+                            final ProgressDialog dialog;
+                            dialog = ProgressDialog.show(Robotcomm.this, "",
+                                    "Executing Command. Please wait...", true);
+                            new CountDownTimer(2000, 1000) {
+                                @Override
+                                public void onTick(long millisUntilFinished) {
+
+
+                                }
+
+                                @Override
+                                public void onFinish() {
+                                    dialog.dismiss();
+
+                                }
+                            }.start();
+                        }
+
+
+                        Looper.loop();
+                    }
+                });
+
+                thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            if (s == null) {
+                                s = new Socket(ip, 800);
+                            } else if (!s.isConnected()) {
+                                s.connect(new InetSocketAddress(ip, 800));
+                            }
+
+                            output = new PrintWriter(out, true);
+                            output.write(cmd);
+                            writer = new PrintWriter(output, true);
+                            writer.println("");
+
+
+                            input = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                            st = null;
+                            st = input.readLine();
+
+                            if (st.trim().length() != 0) {
+                                //Run on UI thread to update UI
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        edt_send_message.setEnabled(true);
+                                        btn_send.setEnabled(true);
+                                    }
+                                });
+
+
+                            }
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                });
+
+                thread.start();
+
+            }
+
+
+        }, 100);
+
+
+    }
+    final Handler mHandler = new Handler();
+    private Thread mUiThread;
+    public final void runOnUiThread(Runnable action) {
+        if (Thread.currentThread() != mUiThread) {
+            mHandler.post(action);
+        } else {
+            action.run();
+        }
+    }
+
+
+}
